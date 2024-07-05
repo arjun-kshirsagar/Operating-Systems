@@ -9,9 +9,9 @@ import java.util.concurrent.Future;
 
 public class MergeSort {
     public static void main(String[] args) throws InterruptedException, ExecutionException {
-        ExecutorService es = Executors.newFixedThreadPool(2);
+        ExecutorService es = Executors.newFixedThreadPool(10000);
         ArrayList<Integer> list = new ArrayList<>();
-        for(int i = 0; i < 1000; i++){
+        for(int i = 0; i < 10000; i++){
             list.add((int)(Math.random() * 1000));
         }
         // list.add(3); list.add(1); list.add(5); list.add(2); list.add(4); list.add(19); list.add(0); list.add(7);
@@ -40,7 +40,7 @@ class Sorter implements Callable<ArrayList<Integer>>{
         ArrayList<Integer> rightHalfToSort = getSubArray(listToSort, mid, listToSort.size());
 
         // Executor service to sort the two halves in parallel
-        ExecutorService es = Executors.newFixedThreadPool(2);
+        ExecutorService es = Executors.newFixedThreadPool(20000);
 
         // Create two subtasks with two sublists to assign them to different threads
         Sorter lefSorter = new Sorter(leftHalfToSort);
@@ -89,3 +89,18 @@ class Sorter implements Callable<ArrayList<Integer>>{
     }
     
 }
+
+// Multi-threaded merge sort is way slower than the sequential single threaded merge sort
+// this is because it is creating exponential threads (2^N) it takes a lot of memory and also context switching is expensive
+// hence its slower than the single threaded merge sort
+
+// we use merge-sort because merging is much optimal process than sorting
+
+
+// Write sequential megre srt algor
+// Write multi-threaded merge sort using newFixedThreadPool
+// Write multi-threaded merge sort using newCachedThreadPool
+// Compare the performance of all the 3 merge sort
+
+// calculate the execution time of all the 3 merge sort
+// graph all the three, and decide which one is better
