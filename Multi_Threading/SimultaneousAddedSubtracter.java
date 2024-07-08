@@ -12,53 +12,51 @@ public class SimultaneousAddedSubtracter {
     public static void main(String[] args) throws InterruptedException, ExecutionException {
         Value value = new Value(0);
         ExecutorService es = Executors.newFixedThreadPool(10);
+        // Lock lock = new ReentrantLock();
+        // We dont need the lock object as we can use the object itself as a lock of the shared resource
 
-        Lock lock = new ReentrantLock();
-        Adder adder = new Adder(value, lock);
-        Subtracter subtracter = new Subtracter(value, lock);
+        AdderWithSynchronisation adder = new AdderWithSynchronisation(value);
+        SubtracterWithSynchronisation subtracter = new SubtracterWithSynchronisation(value);
+
         Future<Void> adderFuture = es.submit(adder);
         Future<Void> subtracterFuture = es.submit(subtracter);
         adderFuture.get();
         subtracterFuture.get();
         
         System.out.println(value.val);
-        
+        es.shutdown();
     }
 }
 
-class Adder implements Callable<Void>{
-    Lock lock;
+class AdderWithSynchronisation implements Callable<Void>{
     Value value;
-    public Adder(Value value, Lock lock){
-        this.lock = lock;
+    public AdderWithSynchronisation(Value value){
         this.value = value;
     }
     @Override
     public Void call() {
         for(int i = 1; i <= 100; i++){
-            lock.lock();
-            value.val += i;
-            lock.unlock();
+            synchronized(value){
+                value.val += i;
+            }
         }
         return null;
     }
 
 }
 
-class Subtracter implements Callable<Void>{
+class SubtracterWithSynchronisation implements Callable<Void>{
     Value value;
-    Lock lock;
-    public Subtracter(Value value, Lock lock){
+    public SubtracterWithSynchronisation(Value value){
         this.value = value;
-        this.lock = lock;
     }
     
     @Override
     public Void call() {
         for(int i = 1; i <= 100; i++){
-            lock.lock();
-            value.val -= i; 
-            lock.unlock();
+            synchronized(value){
+                value.val -= i;
+            }
         }
         return null;
     }
